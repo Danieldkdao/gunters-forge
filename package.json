@@ -7,14 +7,16 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "generate": "drizzle-kit generate",
-    "migrate": "drizzle-kit migrate"
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:auth": "pnpm dlx auth@latest generate --config ./src/lib/auth/auth.ts --output ./src/db/schemas/new-user.ts --yes"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
     "@neondatabase/serverless": "^1.2.0",
     "@shadcn/react": "^0.3.1",
     "@t3-oss/env-nextjs": "^0.13.11",
+    "better-auth": "^1.7.7",
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
     "cn": "^0.4.0",
@@ -24,6 +26,7 @@
     "input-otp": "^1.5.0",
     "lucide-react": "^1.56.0",
     "next": "16.4.0",
+    "node-mailjet": "^6.0.11",
     "react": "19.3.0",
     "react-day-picker": "^10.0.2",
     "react-dom": "19.3.0",
