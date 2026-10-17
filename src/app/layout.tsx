@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Crimson_Text, MedievalSharp } from "next/font/google";
 import "./globals.css";
+import { Providers } from "@/components/providers";
 
 const crimsonText = Crimson_Text({
   subsets: ["latin"],
@@ -32,7 +33,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         medievalSharp.variable,
       )}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

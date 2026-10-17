@@ -1,9 +1,20 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
+import { useAuthSession } from "@/hooks/use-auth-session";
+import { useSignOut } from "@/hooks/use-sign-out";
 
 const Home = () => {
+  const { data: session } = useAuthSession();
+  const { signOut, isSignOutPending } = useSignOut();
+
   return (
     <div>
-      <Button>This is a button</Button>
+      {session?.user && (
+        <Button onClick={signOut} disabled={isSignOutPending}>
+          Sign Out
+        </Button>
+      )}
     </div>
   );
 };
