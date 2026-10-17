@@ -1,6 +1,7 @@
 import { serverEnv } from "@/data/env/server";
 import { betterAuth } from "better-auth";
 import { emailOTP } from "better-auth/plugins/email-otp";
+import { admin } from "better-auth/plugins/admin";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "@/db/db";
 import { sendVerificationOtp } from "@/services/mailjet/emails/verification-emails";
@@ -37,6 +38,7 @@ export const auth = betterAuth({
         await sendVerificationOtp(data);
       },
     }),
+    admin(),
   ],
   database: drizzleAdapter(db, {
     provider: "pg",

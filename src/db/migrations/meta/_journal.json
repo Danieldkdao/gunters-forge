@@ -8,6 +8,13 @@
       "when": 1792120307901,
       "tag": "0000_rare_landau",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792262865785,
+      "tag": "0001_serious_liz_osborn",
+      "breakpoints": true
     }
   ]
 }
