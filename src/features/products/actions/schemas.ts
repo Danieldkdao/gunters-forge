@@ -37,7 +37,7 @@ export const createProductSchema = z.object({
     .string()
     .trim()
     .min(1, { error: "Please enter a product description." }),
-  imageUrl: z.string().nullish(),
+  imageUrl: z.url("Please enter a valid image URL."),
   category: z.enum(productCategories),
   price: z
     .number({ error: "Please enter a number." })

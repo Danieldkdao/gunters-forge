@@ -5,13 +5,16 @@ import {
   ProductTable,
 } from "@/db/schema";
 import { userHasPermission } from "@/lib/auth/helpers";
-import { eq } from "drizzle-orm";
+import { and, eq, SQL } from "drizzle-orm";
 import { revalidateProductCache } from "./cache/products";
 
-export const confirmProductExistenceDb = async (productId: string) => {
+export const confirmProductExistenceDb = async (
+  productId: string,
+  additionalFilters?: SQL<unknown>[],
+) => {
   return (
     (await db.query.ProductTable.findFirst({
-      where: eq(ProductTable.id, productId),
+      where: and(eq(ProductTable.id, productId), ...(additionalFilters ?? [])),
     })) ?? null
   );
 };

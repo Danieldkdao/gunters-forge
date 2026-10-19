@@ -40,6 +40,12 @@ import {
   updateProductSchema,
   UpdateProductSchema,
 } from "./schemas";
+import {
+  createStripeProduct,
+  disableStripeProduct,
+  updateStripeProduct,
+} from "@/services/stripe/helpers";
+import { getPriceId } from "@/services/stripe/utils";
 
 // Validate filter options passed in, returns products if everything checks out, otherwise returns null
 export const readProductsAction = async (
@@ -157,9 +163,19 @@ export const createProductAction = async (unsafeData: CreateProductSchema) => {
     };
   }
 
+  const stripeProduct = await createStripeProduct(data);
+  if (!stripeProduct) {
+    return {
+      error: true as const,
+      message: GENERAL_ERROR_MESSAGE,
+    };
+  }
+
   try {
     const createdProduct = await insertProductDb({
       ...data,
+      stripeProductId: stripeProduct.id,
+      stripePriceId: getPriceId(stripeProduct.default_price),
     });
     if (!createdProduct) throw new Error("Failed to create product.");
 
@@ -213,8 +229,22 @@ export const updateProductAction = async (
     };
   }
 
+  const stripeProduct = await updateStripeProduct({
+    ...existingProduct,
+    ...data,
+  });
+  if (!stripeProduct) {
+    return {
+      error: true as const,
+      message: GENERAL_ERROR_MESSAGE,
+    };
+  }
+
   try {
-    const updatedProduct = await updateProductDb(existingProduct.id, data);
+    const updatedProduct = await updateProductDb(existingProduct.id, {
+      ...data,
+      stripePriceId: getPriceId(stripeProduct.default_price),
+    });
     if (!updatedProduct) throw new Error("Failed to update product.");
 
     return {
@@ -252,6 +282,14 @@ export const deleteProductAction = async (productId: string) => {
     return {
       error: true as const,
       message: NOT_FOUND_ERROR_MESSAGE,
+    };
+  }
+
+  const disabledStripeProduct = await disableStripeProduct(existingProduct);
+  if (!disabledStripeProduct) {
+    return {
+      error: true,
+      message: GENERAL_ERROR_MESSAGE,
     };
   }
 
