@@ -55,6 +55,7 @@ export const VerifyAccount = ({ email, setEmail }: VerifyAccountProps) => {
         onSuccess: () => {
           toast.success("Account verified successfully!");
           router.push("/dashboard");
+          setEmail(null);
         },
         onError: (error) => {
           toast.error(error.error.message || GENERAL_ERROR_MESSAGE);

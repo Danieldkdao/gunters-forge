@@ -9,12 +9,13 @@ export const ProductTable = pgTable("products", {
   description: text("description").notNull(),
   imageUrl: text("image"),
   category: productCategoryEnum("category").notNull(),
+  // price in cents, format as coins and dollars
   price: integer("price").notNull(),
   craftingTimeMinutes: integer("crafting_time_minutes").notNull(),
-  displayOrder: integer("display_order").notNull(),
+  featured: boolean("featured").notNull(),
   isActive: boolean("is_active").notNull(),
   ...timestamps,
 });
 
-export type ProductInsertType = typeof ProductTable.$inferInsert;
-export type ProductSelectType = typeof ProductTable.$inferSelect;
+export type ProductInsertData = typeof ProductTable.$inferInsert;
+export type ProductSelectData = typeof ProductTable.$inferSelect;

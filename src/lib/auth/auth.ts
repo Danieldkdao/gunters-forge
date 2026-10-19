@@ -1,10 +1,12 @@
 import { serverEnv } from "@/data/env/server";
 import { betterAuth } from "better-auth";
 import { emailOTP } from "better-auth/plugins/email-otp";
-import { admin } from "better-auth/plugins/admin";
+import { admin as adminPlugin } from "better-auth/plugins/admin";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "@/db/db";
 import { sendVerificationOtp } from "@/services/mailjet/emails/verification-emails";
+import { roleOptions } from "./permissions";
+import { nextCookies } from "better-auth/next-js";
 
 export const auth = betterAuth({
   advanced: {
@@ -38,7 +40,10 @@ export const auth = betterAuth({
         await sendVerificationOtp(data);
       },
     }),
-    admin(),
+    adminPlugin({
+      ...roleOptions,
+    }),
+    nextCookies(),
   ],
   database: drizzleAdapter(db, {
     provider: "pg",

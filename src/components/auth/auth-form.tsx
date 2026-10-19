@@ -1,23 +1,27 @@
 "use client";
 
+import { UserRole } from "@/db/shared";
+import { signInWithTestCredentials } from "@/lib/auth/actions";
 import { authClient } from "@/lib/auth/auth-client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import z from "zod";
-import { toast } from "../ui/toast";
 import { SocialProvider } from "@/lib/types";
-import { VerifyAccount } from "./verify-account";
-import { Card, CardContent } from "../ui/card";
-import { Button } from "../ui/button";
-import { LoadingSwap } from "../loading-swap";
+import { cn } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ShieldUserIcon, UserIcon } from "lucide-react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useState, useTransition } from "react";
+import { Controller, useForm, useFormState } from "react-hook-form";
 import { FaGithub, FaGoogle } from "react-icons/fa6";
-import { Separator } from "../ui/separator";
+import z from "zod";
+import { LoadingSwap } from "../loading-swap";
+import { PasswordInput, PasswordInputStrengthChecker } from "../password-input";
+import { Button } from "../ui/button";
+import { Card, CardContent } from "../ui/card";
 import { Field, FieldContent, FieldError, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
-import { PasswordInput, PasswordInputStrengthChecker } from "../password-input";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { Separator } from "../ui/separator";
+import { toast } from "../ui/toast";
+import { VerifyAccount } from "./verify-account";
 
 export const AuthForm = ({ signIn = true }: { signIn?: boolean }) => {
   const formSchema = z
@@ -43,6 +47,7 @@ export const AuthForm = ({ signIn = true }: { signIn?: boolean }) => {
   const searchParams = useSearchParams();
   const [verifyEmail, setVerifyEmail] = useState<string | null>(null);
   const [isSocialAuth, setIsSocialAuth] = useState(false);
+  const [isTestAuthenticating, startTransition] = useTransition();
   const form = useForm<FormType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,6 +55,10 @@ export const AuthForm = ({ signIn = true }: { signIn?: boolean }) => {
       email: "",
       password: "",
     },
+  });
+  // Make sure that this is not cached so buttons aren't enabled during submission
+  const { isSubmitting } = useFormState({
+    control: form.control,
   });
 
   const currentQueryString = useMemo(
@@ -89,18 +98,26 @@ export const AuthForm = ({ signIn = true }: { signIn?: boolean }) => {
         },
         onError: async (error) => {
           console.error(error);
+          // Handles unverified email sign-ins, auth config already handles the email sending
           if (error.error.code === "EMAIL_NOT_VERIFIED") {
             setVerifyEmail(data.email);
             toast.error("Please verify your email to continue.");
-            await authClient.emailOtp.sendVerificationOtp({
-              email: data.email,
-              type: "email-verification",
-            });
             return;
           }
           toast.error(error.error.message);
         },
       },
+    });
+  };
+
+  const handleTestSignIn = (role: UserRole) => {
+    startTransition(async () => {
+      const response = await signInWithTestCredentials(role);
+      if (response.error) {
+        toast.error(response.message);
+      } else {
+        toast.success(response.message);
+      }
     });
   };
 
@@ -118,7 +135,7 @@ export const AuthForm = ({ signIn = true }: { signIn?: boolean }) => {
     });
   };
 
-  const isAuthenticating = form.formState.isSubmitting || isSocialAuth;
+  const isAuthenticating = isSubmitting || isTestAuthenticating || isSocialAuth;
 
   if (verifyEmail) {
     return <VerifyAccount email={verifyEmail} setEmail={setVerifyEmail} />;
@@ -226,21 +243,54 @@ export const AuthForm = ({ signIn = true }: { signIn?: boolean }) => {
                     id="sign-up-password-input"
                     aria-invalid={!!fieldState.error}
                   >
-                    <PasswordInputStrengthChecker />
+                    {!signIn && <PasswordInputStrengthChecker />}
                   </PasswordInput>
                 </FieldContent>
                 {fieldState.error && (
-                  <FieldError errors={[fieldState.error]} className="-mt-6" />
+                  <FieldError
+                    errors={[fieldState.error]}
+                    className={cn(!signIn && "-mt-6")}
+                  />
                 )}
               </Field>
             )}
           />
           <Button type="submit" className="w-full" disabled={isAuthenticating}>
-            <LoadingSwap isLoading={form.formState.isSubmitting}>
+            <LoadingSwap isLoading={isSubmitting}>
               {signIn ? "Sign In" : "Create Account"}
             </LoadingSwap>
           </Button>
         </form>
+        <div className="flex flex-col gap-2 w-full">
+          <Button
+            variant="outline"
+            className="w-full"
+            disabled={isAuthenticating}
+            onClick={() => handleTestSignIn("admin")}
+          >
+            <LoadingSwap
+              isLoading={isTestAuthenticating}
+              className="flex items-center gap-2"
+            >
+              <ShieldUserIcon />
+              Test as Admin
+            </LoadingSwap>
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full"
+            disabled={isAuthenticating}
+            onClick={() => handleTestSignIn("user")}
+          >
+            <LoadingSwap
+              isLoading={isTestAuthenticating}
+              className="flex items-center gap-2"
+            >
+              <UserIcon />
+              Test as Customer
+            </LoadingSwap>
+          </Button>
+        </div>
         <Link
           href={`/${signIn ? "sign-up" : "sign-in"}?${currentQueryString}`}
           className="text-sm font-medium text-muted-foreground"

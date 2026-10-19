@@ -63,160 +63,110 @@ export const sendVerificationOtp = async ({
   ].join("\n");
 
   const html = `<!doctype html>
-  <html lang="en">
+    <html lang="en">
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>${heading}</title>
     </head>
 
-    <body
-      style="
-        margin: 0;
-        padding: 0;
-        background-color: #f8fafc;
-        color: #111827;
-        font-family: Outfit, Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-          Arial, sans-serif;
-        letter-spacing: -0.015em;
-      "
-    >
-      <div
-        style="
-          background-color: #f8fafc;
-          margin: 0;
-          padding: 32px 16px;
-          width: 100%;
-          box-sizing: border-box;
-        "
-      >
-        <div
-          style="
-            max-width: 560px;
-            margin: 0 auto;
-            width: 100%;
-            box-sizing: border-box;
-          "
-        >
-          <div style="padding: 32px 32px 20px 32px; text-align: center">
-            <h1
-              style="
-                margin: 0;
-                color: #111827;
-                font-family: Outfit, 'Times New Roman', serif;
-                font-size: 32px;
-                line-height: 1.15;
-                font-weight: 700;
-                letter-spacing: -0.03em;
-              "
-            >
-              ${heading}
-            </h1>
+    <body style="margin:0;padding:0;background-color:#f2e8d5;color:#2b2623;font-family:Outfit,Arial,sans-serif;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+        style="background-color:#f2e8d5;">
+        <tr>
+          <td align="center" style="padding:40px 16px;">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+              style="max-width:560px;background-color:#e9dfcc;border:1px solid #8c7b6b;border-radius:3px;">
 
-            <p
-              style="
-                margin: 14px 0 0 0;
-                color: #64748b;
-                font-size: 16px;
-                line-height: 1.6;
-              "
-            >
-              ${instruction}
-            </p>
-          </div>
+              <tr>
+                <td align="center"
+                  style="padding:24px;background-color:#332f2c;border-bottom:3px solid #c49a50;">
+                  <p style="margin:0;color:#f2e8d5;font-family:Georgia,'Times New Roman',serif;font-size:24px;font-weight:700;letter-spacing:1px;">
+                    ${APP_NAME}
+                  </p>
+                </td>
+              </tr>
 
-          <div style="padding: 12px 32px 28px 32px">
-            <div
-              style="
-                color: #4f46e5;
-                font-size: 40px;
-                line-height: 1;
-                font-weight: 800;
-                letter-spacing: 0.18em;
-                font-family: Outfit, Inter, -apple-system, BlinkMacSystemFont,
-                  'Segoe UI', Arial, sans-serif;
-                text-align: center;
-              "
-            >
-              ${otp}
-            </div>
-          </div>
+              <tr>
+                <td align="center" style="padding:32px 24px 0;">
+                  <p style="margin:0 0 12px;color:#8c3026;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">
+                    A message from the forge
+                  </p>
 
-          <div style="padding: 0 32px 32px 32px">
-            <p
-              style="
-                margin: 0;
-                color: #334155;
-                font-size: 15px;
-                line-height: 1.7;
-                text-align: center;
-              "
-            >
-              This code will expire in
-              <strong>15 minutes</strong>. Do not share this code with anyone.
-            </p>
+                  <h1 style="margin:0;color:#2b2623;font-family:Georgia,'Times New Roman',serif;font-size:30px;line-height:1.25;font-weight:700;">
+                    ${heading}
+                  </h1>
 
-            <p
-              style="
-                margin: 16px 0 0 0;
-                color: #64748b;
-                font-size: 14px;
-                line-height: 1.7;
-                text-align: center;
-              "
-            >
-              If you did not request this code, you can safely ignore this email.
-            </p>
-          </div>
+                  <p style="margin:16px 0 0;color:#5c534d;font-size:16px;line-height:1.7;">
+                    ${instruction}
+                  </p>
+                </td>
+              </tr>
 
-          <div style="padding: 0 32px">
-            <div
-              style="
-                height: 1px;
-                background-color: #e2e8f0;
-                line-height: 1px;
-                font-size: 1px;
-              "
-            >
-              &nbsp;
-            </div>
-          </div>
+              <tr>
+                <td align="center" style="padding:28px 24px;">
+                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+                    style="background-color:#f2e8d5;border:1px solid #8c7b6b;border-top:3px solid #8c3026;border-radius:3px;">
+                    <tr>
+                      <td align="center" style="padding:20px 12px 24px;">
+                        <p style="margin:0 0 12px;color:#5c534d;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">
+                          Your verification code
+                        </p>
 
-          <div style="padding: 24px 32px 32px 32px; text-align: center">
-            <p
-              style="
-                margin: 0;
-                color: #94a3b8;
-                font-size: 13px;
-                line-height: 1.6;
-              "
-            >
-              Sent by ${APP_NAME}
-            </p>
+                        <p style="margin:0;color:#8c3026;font-family:'Courier New',Courier,monospace;font-size:36px;line-height:1.3;font-weight:700;letter-spacing:5px;">
+                          ${otp}
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
 
-            <p
-              style="
-                margin: 8px 0 0 0;
-                color: #94a3b8;
-                font-size: 12px;
-                line-height: 1.6;
-              "
-            >
-              This is an automated message. Please do not reply.
-            </p>
+              <tr>
+                <td align="center" style="padding:0 24px 28px;">
+                  <p style="margin:0;color:#2b2623;font-size:14px;line-height:1.7;">
+                    This code expires in <strong>15 minutes</strong>.<br />
+                    Keep it private. Do not share it with anyone.
+                  </p>
 
-            <p
-              style="
-                margin: 8px 0 0 0;
-                color: #94a3b8;
-                font-size: 12px;
-                line-height: 1.6;
-              "
-            >
-              © 2026 ${APP_NAME}. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </div>
+                  <p style="margin:16px 0 0;color:#5c534d;font-size:13px;line-height:1.7;">
+                    If you did not request this code, you can safely ignore this email.
+                  </p>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="padding:0 24px;">
+                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                    <tr>
+                      <td height="1" style="height:1px;background-color:#8c7b6b;font-size:1px;line-height:1px;">
+                        &nbsp;
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <tr>
+                <td align="center" style="padding:22px 24px 28px;">
+                  <p style="margin:0;color:#5c534d;font-size:13px;line-height:1.7;">
+                    Sent by <strong>${APP_NAME}</strong>
+                  </p>
+
+                  <p style="margin:8px 0 0;color:#5c534d;font-size:12px;line-height:1.7;">
+                    This is an automated message. Please do not reply.
+                  </p>
+
+                  <p style="margin:8px 0 0;color:#5c534d;font-size:12px;line-height:1.7;">
+                    &copy; 2026 ${APP_NAME}. All rights reserved.
+                  </p>
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
     </body>
   </html>`;
 
