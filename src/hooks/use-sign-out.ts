@@ -26,6 +26,6 @@ export const useSignOut = () => {
 
   return {
     signOut,
-    isSignOutPending: isPending,
+    isSigningOut: isPending,
   };
 };

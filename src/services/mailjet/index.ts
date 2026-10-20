@@ -44,7 +44,7 @@ export const sendEmail = async ({
           To: recipients.map((email) => ({
             Email: email,
           })),
-          Subjetc: subject,
+          Subject: subject,
           TextPart: text,
           HTMLPart: html,
         },

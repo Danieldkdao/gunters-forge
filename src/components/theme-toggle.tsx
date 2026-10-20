@@ -1,0 +1,62 @@
+"use client";
+
+import { useIsMounted } from "@/hooks/use-is-mounted";
+import { LaptopIcon, MoonIcon, SunIcon } from "lucide-react";
+import { useTheme } from "next-themes";
+import { ComponentProps } from "react";
+import { Button } from "./ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+
+export const ThemeToggle = (props: ComponentProps<typeof Button>) => {
+  const isMounted = useIsMounted();
+  const { setTheme, resolvedTheme, theme } = useTheme();
+
+  // Preserve the system selection instead of replacing it with the resolved theme
+  const activeTheme = theme == "system" ? theme : (resolvedTheme ?? theme);
+
+  if (!isMounted || !activeTheme) return null;
+
+  const themes = [
+    { label: "Light", theme: "light", icon: SunIcon },
+    { label: "Dark", theme: "dark", icon: MoonIcon },
+    {
+      label: "System",
+      theme: "system",
+      icon: LaptopIcon,
+    },
+  ];
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        render={
+          <Button variant="ghost" size="icon-sm" {...props}>
+            {activeTheme === "system" ? (
+              <LaptopIcon />
+            ) : activeTheme === "dark" ? (
+              <MoonIcon />
+            ) : (
+              <SunIcon />
+            )}
+          </Button>
+        }
+      />
+      <DropdownMenuContent>
+        {themes.map((theme) => (
+          <DropdownMenuItem
+            key={theme.theme}
+            onClick={() => setTheme(theme.theme)}
+          >
+            <theme.icon />
+            <span>{theme.label}</span>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};

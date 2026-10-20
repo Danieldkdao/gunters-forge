@@ -6,7 +6,6 @@ export const NO_PERMISSION_DATA_MESSAGE =
   "You do not have permission to do this.";
 export const NOT_FOUND_ERROR_MESSAGE = "Resource not found.";
 
-export const DEFAULT_PAGE = 1;
 export const PAGE_SIZE = 20;
 
 export const socialProviders = ["google", "github"] as const;
