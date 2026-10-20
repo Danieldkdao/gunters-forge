@@ -44,17 +44,22 @@ export const ProductForm = ({
   const router = useRouter();
   const form = useForm<CreateProductSchema>({
     resolver: zodResolver(createProductSchema),
-    defaultValues: {
-      name: "",
-      slug: "",
-      description: "",
-      category: "armor",
-      price: undefined,
-      craftingTimeMinutes: undefined,
-      featured: false,
-      imageUrl: "",
-      isActive: true,
-    },
+    defaultValues: existingProduct
+      ? {
+          ...existingProduct,
+          price: existingProduct.price / 100,
+        }
+      : {
+          name: "",
+          slug: "",
+          description: "",
+          category: "armor",
+          price: undefined,
+          craftingTimeMinutes: undefined,
+          featured: false,
+          imageUrl: "",
+          isActive: true,
+        },
   });
 
   const handleSubmit = async (data: CreateProductSchema) => {
@@ -209,11 +214,11 @@ export const ProductForm = ({
                   value={value ?? ""}
                   type="number"
                   min="1"
-                  // Keep NaN value as undefined so we can show validation error
+                  // Keep NaN value as null so we can show validation error
                   onChange={(e) =>
                     onChange(
                       Number.isNaN(e.target.valueAsNumber)
-                        ? undefined
+                        ? null
                         : e.target.valueAsNumber,
                     )
                   }
@@ -252,7 +257,7 @@ export const ProductForm = ({
                   onChange={(e) =>
                     onChange(
                       Number.isNaN(e.target.valueAsNumber)
-                        ? undefined
+                        ? null
                         : e.target.valueAsNumber,
                     )
                   }

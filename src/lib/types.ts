@@ -7,7 +7,7 @@ import { PgColumn, PgTable } from "drizzle-orm/pg-core";
 export type ParamsId<T extends string> = {
   params: Promise<Record<T, string>>;
 };
-export type SearchParamsType = { searchParams: Promise<SearchParams> };
+export type SearchParamsProps = { searchParams: Promise<SearchParams> };
 export type SetterType<T> = Dispatch<SetStateAction<T>>;
 export type UnwrapAsync<T extends (...params: never[]) => unknown> =
   NonNullable<Awaited<ReturnType<T>>>;

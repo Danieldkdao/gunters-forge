@@ -1,7 +1,11 @@
 import { productCategories } from "@/db/shared";
 import { generateSlug } from "@/lib/utils";
 import z from "zod";
-import { productsSortByOptions } from "../lib/params";
+import {
+  productsActiveOptions,
+  productsFeaturedOptions,
+  productsSortByOptions,
+} from "../lib/params";
 import {
   createCursorPaginationSchema,
   isoTimestampSchema,
@@ -18,8 +22,9 @@ export const readProductsOptionsSchema = z.object({
   search: z.string().trim().default(""),
   sortBy: z.enum(productsSortByOptions).default("recently_created"),
   categories: z.array(z.enum(productCategories)).default([]),
-  featuredOnly: z.boolean().default(false),
-  lastCursor: z.base64url().nullish(),
+  featured: z.enum(productsFeaturedOptions).default("all"),
+  active: z.enum(productsActiveOptions).default("all"),
+  lastCursor: z.base64url().nullable().default(null).optional(),
 });
 export type ReadProductsOptionsSchema = z.infer<
   typeof readProductsOptionsSchema

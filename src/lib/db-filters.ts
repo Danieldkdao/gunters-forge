@@ -48,6 +48,30 @@ export const createInArrayFilter = <
 ) =>
   array.length ? inArray(table[property] as TableProperty, array) : undefined;
 
+export const createMapFilter = <
+  T extends PgTable,
+  P extends KeysOfType<T, TableProperty>,
+  const K extends { readonly key: string },
+  Option extends K & { value: unknown | undefined },
+>(
+  table: T,
+  property: P,
+  value: K["key"],
+  options: Option[],
+) => {
+  const map = Object.fromEntries(
+    options.map((option) => [
+      option.key,
+      // Only disable undefined values here, not falsy values like false or zero which are valid
+      option.value !== undefined
+        ? eq(table[property] as TableProperty, option.value)
+        : undefined,
+    ]),
+  ) as Record<K["key"], SQL<unknown> | undefined>;
+
+  return map[value];
+};
+
 // Build each sort option so the pagination follows the correct direction each time
 export const createSortByMap = <
   T extends PgTable & { id: TableIdColumn<GetTableName<T>> },

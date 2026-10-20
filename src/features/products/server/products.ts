@@ -58,21 +58,3 @@ export const updateProductDb = async (
 
   return updatedProduct;
 };
-
-export const deleteProductDb = async (productId: string) => {
-  const { hasPermission } = await userHasPermission({ product: ["delete"] });
-  if (!hasPermission) return null;
-
-  const existingProduct = await confirmProductExistenceDb(productId);
-  if (!existingProduct) return null;
-
-  const [deletedProduct] = await db
-    .delete(ProductTable)
-    .where(eq(ProductTable.id, existingProduct.id))
-    .returning();
-  if (!deletedProduct) return null;
-
-  revalidateProductCache(deletedProduct.id);
-
-  return deletedProduct;
-};

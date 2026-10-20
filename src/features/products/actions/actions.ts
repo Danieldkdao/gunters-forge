@@ -12,6 +12,7 @@ import {
 } from "@/lib/constants";
 import {
   createInArrayFilter,
+  createMapFilter,
   createSearchFilter,
   createSortByMap,
 } from "@/lib/db-filters";
@@ -22,12 +23,17 @@ import {
   normalizeData,
   writeCursor,
 } from "@/lib/utils";
+import {
+  createStripeProduct,
+  updateStripeProduct,
+} from "@/services/stripe/helpers";
+import { getPriceId } from "@/services/stripe/utils";
 import { and } from "drizzle-orm";
 import { cacheTag } from "next/cache";
+import { convertDollarsToCents } from "../lib/utils";
 import { getGlobalProductTag } from "../server/cache/products";
 import {
   confirmProductExistenceDb,
-  deleteProductDb,
   insertProductDb,
   updateProductDb,
 } from "../server/products";
@@ -41,12 +47,11 @@ import {
   UpdateProductSchema,
 } from "./schemas";
 import {
-  createStripeProduct,
-  disableStripeProduct,
-  updateStripeProduct,
-} from "@/services/stripe/helpers";
-import { getPriceId } from "@/services/stripe/utils";
-import { convertDollarsToCents } from "../lib/utils";
+  ProductsActiveOption,
+  productsActiveOptions,
+  ProductsFeaturedOption,
+  productsFeaturedOptions,
+} from "../lib/params";
 
 // Validate filter options passed in, returns products if everything checks out, otherwise returns null
 export const readProductsAction = async (
@@ -59,11 +64,24 @@ export const readProductsAction = async (
     readProductsOptionsSchema.safeParse(options);
   if (!dataSuccess) return null;
 
-  const { search, sortBy, categories, lastCursor } = optionsData;
+  const { search, sortBy, categories, featured, active, lastCursor } =
+    optionsData;
 
   const { data: cursorData, success: cursorSuccess } =
     productsCursorPaginationSchema.safeParse(lastCursor);
   if (!cursorSuccess) return null;
+
+  const featuredMap: Record<ProductsFeaturedOption, boolean | undefined> = {
+    all: undefined,
+    featured: true,
+    standard: false,
+  };
+
+  const activeMap: Record<ProductsActiveOption, boolean | undefined> = {
+    all: undefined,
+    active: true,
+    inactive: false,
+  };
 
   const searchFilter = createSearchFilter(ProductTable, search, [
     "name",
@@ -74,6 +92,24 @@ export const readProductsAction = async (
     ProductTable,
     categories,
     "category",
+  );
+  const featuredFilter = createMapFilter(
+    ProductTable,
+    "featured",
+    featured,
+    productsFeaturedOptions.map((option) => ({
+      key: option,
+      value: featuredMap[option],
+    })),
+  );
+  const activeFilter = createMapFilter(
+    ProductTable,
+    "isActive",
+    active,
+    productsActiveOptions.map((option) => ({
+      key: option,
+      value: activeMap[option],
+    })),
   );
   const sortByMap = createSortByMap(ProductTable, cursorData, [
     {
@@ -105,7 +141,13 @@ export const readProductsAction = async (
 
   const sortByOption = sortByMap[sortBy];
 
-  const filters = and(searchFilter, categoryFilter, sortByOption.cursorFilter);
+  const filters = and(
+    searchFilter,
+    categoryFilter,
+    sortByOption.cursorFilter,
+    featuredFilter,
+    activeFilter,
+  );
 
   // Fetch one more record than requested page size to check if there is a next page or not
   const products = await db
@@ -117,10 +159,11 @@ export const readProductsAction = async (
 
   const hasNextPage = products.length > PAGE_SIZE;
 
+  // Continues from the last page
   const nextCursor = hasNextPage
     ? writeCursor({
         id: products[PAGE_SIZE - 1].id,
-        timestamp: normalizeData(
+        marker: normalizeData(
           products[PAGE_SIZE - 1][sortByOption.nextCursorField],
         ),
       })
@@ -133,9 +176,11 @@ export const readProductsAction = async (
       updated: product.updatedAt.toISOString(),
     })),
     filters: {
-      search: options.search,
-      sortBy: options.sortBy,
-      categories: options.categories,
+      search,
+      sortBy,
+      categories,
+      featured,
+      active,
     },
   });
 
@@ -279,56 +324,6 @@ export const updateProductAction = async (
     return {
       error: true as const,
       message: GENERAL_ERROR_MESSAGE,
-    };
-  }
-};
-
-export const deleteProductAction = async (productId: string) => {
-  if (!isValidId(productId)) {
-    return {
-      error: true as const,
-      message: NOT_FOUND_ERROR_MESSAGE,
-    };
-  }
-
-  const { hasPermission } = await userHasPermission({ product: ["delete"] });
-  if (!hasPermission) {
-    return {
-      error: true as const,
-      message: NO_PERMISSION_DATA_MESSAGE,
-    };
-  }
-
-  const existingProduct = await confirmProductExistenceDb(productId);
-  if (!existingProduct) {
-    return {
-      error: true as const,
-      message: NOT_FOUND_ERROR_MESSAGE,
-    };
-  }
-
-  const disabledStripeProduct = await disableStripeProduct(existingProduct);
-  if (!disabledStripeProduct) {
-    return {
-      error: true,
-      message: GENERAL_ERROR_MESSAGE,
-    };
-  }
-
-  try {
-    const deletedProduct = await deleteProductDb(existingProduct.id);
-    if (!deletedProduct) throw new Error("Failed to delete product.");
-
-    return {
-      error: false as const,
-      message: "Product deleted successfully!",
-      productId: deletedProduct.id,
-    };
-  } catch (error) {
-    console.error(error);
-    return {
-      error: true as const,
-      message: errorMessage(error),
     };
   }
 };
