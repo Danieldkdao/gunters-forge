@@ -55,7 +55,7 @@ const ProductsSuspense = async ({ searchParams }: SearchParamsProps) => {
         initialProducts={data}
         initialNextCursor={nextCursor}
         view="list"
-        showActive
+        showAllActive
       />
     </div>
   );

@@ -10,6 +10,7 @@ import {
 } from "@/lib/constants";
 import { errorMessage } from "@/lib/utils";
 import { stripe } from "@/services/stripe";
+import { NextResponse } from "next/server";
 import z from "zod";
 
 // TODO: move these schemas and type definitions into the cart feature
@@ -75,11 +76,11 @@ export const POST = async (req: Request) => {
       cancel_url: `${serverEnv.APP_URL}/payment/cancel`,
     });
 
-    return {
+    return NextResponse.json({
       error: false,
       message: "Checkout session created successfully!",
       url: checkoutSession.url,
-    };
+    });
   } catch (error) {
     console.error(error);
     return errorResponse(errorMessage(error), 500);
