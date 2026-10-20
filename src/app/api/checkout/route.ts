@@ -10,7 +10,10 @@ import {
 } from "@/lib/constants";
 import { errorMessage } from "@/lib/utils";
 import { stripe } from "@/services/stripe";
-import { CartItemSchema, cartItemSchema } from "@/stores/cart-store";
+import {
+  CartItemSchema,
+  cartItemSchema,
+} from "@/features/cart/actions/schemas";
 import { NextResponse } from "next/server";
 import z from "zod";
 
