@@ -152,7 +152,7 @@ export function PasswordInputStrengthChecker() {
           );
         })}
       </div>
-      <div className="flex justify-end text-sm text-muted-foreground">
+      <div className="flex justify-end text-base text-muted-foreground">
         {strengthResult.feedback.warning == null ? (
           label
         ) : (

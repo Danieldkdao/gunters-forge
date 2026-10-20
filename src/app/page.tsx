@@ -6,12 +6,12 @@ import { useSignOut } from "@/hooks/use-sign-out";
 
 const Home = () => {
   const { data: session } = useAuthSession();
-  const { signOut, isSignOutPending } = useSignOut();
+  const { signOut, isSigningOut } = useSignOut();
 
   return (
     <div>
       {session?.user && (
-        <Button onClick={signOut} disabled={isSignOutPending}>
+        <Button onClick={signOut} disabled={isSigningOut}>
           Sign Out
         </Button>
       )}

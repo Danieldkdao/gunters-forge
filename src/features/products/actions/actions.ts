@@ -46,6 +46,7 @@ import {
   updateStripeProduct,
 } from "@/services/stripe/helpers";
 import { getPriceId } from "@/services/stripe/utils";
+import { convertDollarsToCents } from "../lib/utils";
 
 // Validate filter options passed in, returns products if everything checks out, otherwise returns null
 export const readProductsAction = async (
@@ -163,6 +164,8 @@ export const createProductAction = async (unsafeData: CreateProductSchema) => {
     };
   }
 
+  // Creates the Stripe product first so we can use the IDs returned
+  // If the creation fails, this does not undo
   const stripeProduct = await createStripeProduct(data);
   if (!stripeProduct) {
     return {
@@ -171,9 +174,13 @@ export const createProductAction = async (unsafeData: CreateProductSchema) => {
     };
   }
 
+  const { price, ...rest } = data;
+
   try {
+    // Convert the dollars to integer cents before storing in DB
     const createdProduct = await insertProductDb({
-      ...data,
+      ...rest,
+      price: convertDollarsToCents(price),
       stripeProductId: stripeProduct.id,
       stripePriceId: getPriceId(stripeProduct.default_price),
     });
@@ -221,7 +228,18 @@ export const updateProductAction = async (
     };
   }
 
-  const { data, success } = updateProductSchema.safeParse(unsafeData);
+  const updateResult = updateProductSchema.safeParse(unsafeData);
+  if (!updateResult.success) {
+    return {
+      error: true as const,
+      message: INVALID_DATA_ERROR_MESSAGE,
+    };
+  }
+
+  const { data, success } = createProductSchema.safeParse({
+    ...existingProduct,
+    ...unsafeData,
+  });
   if (!success) {
     return {
       error: true as const,
@@ -240,9 +258,13 @@ export const updateProductAction = async (
     };
   }
 
+  const { price, ...rest } = data;
+
   try {
     const updatedProduct = await updateProductDb(existingProduct.id, {
-      ...data,
+      ...rest,
+      price:
+        price === existingProduct.price ? price : convertDollarsToCents(price),
       stripePriceId: getPriceId(stripeProduct.default_price),
     });
     if (!updatedProduct) throw new Error("Failed to update product.");

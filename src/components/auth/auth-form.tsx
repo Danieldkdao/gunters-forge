@@ -293,7 +293,7 @@ export const AuthForm = ({ signIn = true }: { signIn?: boolean }) => {
         </div>
         <Link
           href={`/${signIn ? "sign-up" : "sign-in"}?${currentQueryString}`}
-          className="text-sm font-medium text-muted-foreground"
+          className="text-base font-medium text-muted-foreground"
         >
           {signIn
             ? "Don't have an account? Click here to sign up."

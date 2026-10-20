@@ -126,7 +126,7 @@ export const VerifyAccount = ({ email, setEmail }: VerifyAccountProps) => {
           </Button>
         </form>
         <div className="flex items-center gap-4">
-          <span className="text-sm font-medium text-muted-foreground">
+          <span className="text-base font-medium text-muted-foreground">
             Didn&apos;t receive a code?
           </span>
           <Button
