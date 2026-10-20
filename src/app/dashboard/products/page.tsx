@@ -30,7 +30,7 @@ const ProductsPage = (props: SearchParamsProps) => {
 };
 
 const ProductsLoading = () => {
-  return <ProductsListSkeleton />;
+  return <ProductsListSkeleton view="list" />;
 };
 
 const ProductsSuspense = async ({ searchParams }: SearchParamsProps) => {
@@ -49,11 +49,13 @@ const ProductsSuspense = async ({ searchParams }: SearchParamsProps) => {
 
   return (
     <div className="flex flex-col gap-4 w-full min-w-0">
-      <ProductsFilters />
+      <ProductsFilters showActive />
       <ProductsList
         key={key}
         initialProducts={data}
         initialNextCursor={nextCursor}
+        view="list"
+        showActive
       />
     </div>
   );

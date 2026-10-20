@@ -27,7 +27,11 @@ import {
 } from "../lib/params";
 import { SearchInput } from "@/components/search-input";
 
-export const ProductsFilters = () => {
+export const ProductsFilters = ({
+  showActive = false,
+}: {
+  showActive?: boolean;
+}) => {
   const [filters, setFilters] = useProductParams();
 
   return (
@@ -76,16 +80,19 @@ export const ProductsFilters = () => {
               styleOptions={{ placeholder: "Filter by featured" }}
             />
           </div>
-          <div className="flex flex-col gap-2">
-            <FilterLabel>Active</FilterLabel>
-            <SelectFilter
-              value={filters.active}
-              onValueChange={(active) => setFilters({ active })}
-              format={(active) => formatProductActiveOption(active)}
-              options={productsActiveOptions}
-              styleOptions={{ placeholder: "Filter by active" }}
-            />
-          </div>
+          {/* Controls the UI only, product visibility is still determined by the query */}
+          {showActive && (
+            <div className="flex flex-col gap-2">
+              <FilterLabel>Active</FilterLabel>
+              <SelectFilter
+                value={filters.active}
+                onValueChange={(active) => setFilters({ active })}
+                format={(active) => formatProductActiveOption(active)}
+                options={productsActiveOptions}
+                styleOptions={{ placeholder: "Filter by active" }}
+              />
+            </div>
+          )}
         </PopoverContent>
       </Popover>
     </div>
