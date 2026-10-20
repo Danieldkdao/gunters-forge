@@ -35,6 +35,7 @@ import { UserProfile } from "@/components/user-profile";
 import { useAuthSession } from "@/hooks/use-auth-session";
 import { useIsMounted } from "@/hooks/use-is-mounted";
 import { useSignOut } from "@/hooks/use-sign-out";
+import { useCartStore } from "@/stores/cart-store";
 
 const themeOptions = [
   { value: "light", label: "Light", icon: SunIcon },
@@ -48,7 +49,10 @@ export const Header = () => {
   const { theme, setTheme } = useTheme();
   const isMounted = useIsMounted();
 
-  const cartItemCount = 8;
+  const hasHydrated = useCartStore((state) => state.hasHydrated);
+  const cartItemCount = useCartStore((state) =>
+    state.items.reduce((total, item) => total + item.quantity, 0),
+  );
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
@@ -102,7 +106,7 @@ export const Header = () => {
             className="relative size-11 shrink-0"
           >
             <ShoppingCartIcon className="size-5" aria-hidden="true" />
-            {cartItemCount > 0 && (
+            {hasHydrated && cartItemCount > 0 && (
               <span
                 aria-hidden="true"
                 className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-xs font-semibold tabular-nums text-primary-foreground ring-2 ring-background"
