@@ -21,6 +21,7 @@ import {
   formatProductCategory,
 } from "@/features/products/lib/formatters";
 import { Button } from "@/components/ui/button";
+import { AddToCartButton } from "@/features/cart/components/add-to-cart-button";
 
 export const ProductCard = ({ product }: { product: ProductSelectData }) => {
   const { label, icon: CategoryIcon } = formatProductCategory(product.category);
@@ -79,10 +80,7 @@ export const ProductCard = ({ product }: { product: ProductSelectData }) => {
         <span className="text-xl font-semibold tabular-nums">
           {formatPrice(product.price)}
         </span>
-        <Button>
-          <PlusIcon />
-          Add to Cart
-        </Button>
+        <AddToCartButton productId={product.id} />
       </CardFooter>
     </Card>
   );

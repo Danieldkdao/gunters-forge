@@ -10,17 +10,12 @@ import {
 } from "@/lib/constants";
 import { errorMessage } from "@/lib/utils";
 import { stripe } from "@/services/stripe";
+import {
+  CartItemSchema,
+  cartItemSchema,
+} from "@/features/cart/actions/schemas";
 import { NextResponse } from "next/server";
 import z from "zod";
-
-// TODO: move these schemas and type definitions into the cart feature
-const cartItemsSchema = z.array(
-  z.object({
-    productId: z.uuid(),
-    quantity: z.number().int().positive().min(1),
-  }),
-);
-type CartItemsSchema = z.infer<typeof cartItemsSchema>;
 
 export const POST = async (req: Request) => {
   const { userId, user } = await getCurrentUser(req.headers);
@@ -28,8 +23,11 @@ export const POST = async (req: Request) => {
     return errorResponse(UNAUTHED_ERROR_MESSAGE, 401);
   }
 
-  const { cartItems }: { cartItems: CartItemsSchema } = await req.json();
-  if (!cartItems.length || !cartItemsSchema.safeParse(cartItems).success) {
+  const { cartItems }: { cartItems: CartItemSchema[] } = await req.json();
+  if (
+    !cartItems.length ||
+    !z.array(cartItemSchema).safeParse(cartItems).success
+  ) {
     return errorResponse(INVALID_DATA_ERROR_MESSAGE, 400);
   }
 
