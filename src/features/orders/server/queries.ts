@@ -13,12 +13,7 @@ import { PAGE_SIZE } from "@/lib/constants";
 import { normalizeData, writeCursor } from "@/lib/utils";
 import { activeOrderStatuses } from "../lib/lifecycle";
 import { confirmOrderExistenceDb, requireOrderUser } from "./orders";
-
-// In progress work comes first, then using assigned ranking or order number
-const queuePriority = sql`case when ${OrderTable.status} = 'in_progress' then 0 else 1 end`;
-const queueRank = sql`coalesce(${OrderTable.queueRank}, ${OrderTable.orderNumber})`;
-const queueOrder = sql`${queuePriority}, ${queueRank}, ${OrderTable.queuedAt} nulls last,
-  ${OrderTable.createdAt}, ${OrderTable.id}`;
+import { queuePriority, queueRank, queueOrder } from "./queue-order";
 
 export const readOrderQueuePositionDb = async (orderId: string) => {
   const order = await confirmOrderExistenceDb(orderId);
@@ -142,5 +137,7 @@ export const readOrdersDb = async (
   return { data, nextCursor, key };
 };
 
-export type OrderListData = Awaited<ReturnType<typeof readOrdersDb>>["data"][number];
+export type OrderListData = Awaited<
+  ReturnType<typeof readOrdersDb>
+>["data"][number];
 export type OrderDetailsData = Awaited<ReturnType<typeof readOrderDb>>;

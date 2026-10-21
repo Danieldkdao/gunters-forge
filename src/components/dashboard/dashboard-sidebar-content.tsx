@@ -11,6 +11,7 @@ import {
 } from "../ui/sidebar";
 import {
   LayoutDashboardIcon,
+  SparklesIcon,
   PackageIcon,
   ShoppingBagIcon,
 } from "lucide-react";
@@ -34,6 +35,7 @@ const navigation = [
     url: "/dashboard/orders",
     icon: ShoppingBagIcon,
   },
+  { title: "Planning", url: "/dashboard/planning", icon: SparklesIcon },
 ];
 
 export const DashboardSidebarContent = () => (

@@ -50,6 +50,13 @@
       "when": 1792544412980,
       "tag": "0006_order_checkout",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792580703662,
+      "tag": "0007_planner_runs",
+      "breakpoints": true
     }
   ]
 }

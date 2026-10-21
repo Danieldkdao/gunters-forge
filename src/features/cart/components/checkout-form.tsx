@@ -41,7 +41,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useLayoutEffect, useState, useTransition } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
@@ -90,6 +90,13 @@ export const CheckoutForm = ({
   const [error, setError] = useState<string | null>(null);
   const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
+  useLayoutEffect(() => {
+    return () => {
+      setPlacedOrderId(null);
+      setPendingOrderId(null);
+      setError(null);
+    };
+  }, []);
   const productIds = [...new Set(items.map((item) => item.productId))].sort();
   // Reuse drawer cache while checking current prices
   const {

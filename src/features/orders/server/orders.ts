@@ -175,7 +175,9 @@ export const updateOrderDb = async (orderId: string, unsafeData: unknown) => {
       .update(OrderTable)
       .set({
         ...changes,
-        ...(data.queueRank !== undefined ? { queueRank: data.queueRank } : {}),
+        ...(data.queueRank !== undefined
+          ? { queueRank: data.queueRank, queueRankIsManual: true }
+          : {}),
         updatedAt: new Date(),
       })
       .where(eq(OrderTable.id, existing.id))
