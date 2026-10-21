@@ -8,7 +8,15 @@ import {
   applyPlannerRunDb,
   rejectPlannerRunDb,
 } from "../server/reviews";
-import { readPlannerRunDb, readPlannerRunsDb } from "../server/queries";
+import {
+  readPlannerRunDb,
+  readPlannerRunsDb,
+  readPlanningScreenDb,
+} from "../server/queries";
+import {
+  generatePlannerRun,
+  readPlannerGeneration,
+} from "../server/generation";
 import type { ReadPlannerRunsSchema } from "./schemas";
 
 const actionError = (error: unknown) => ({
@@ -76,6 +84,30 @@ export const rejectPlannerRunAction = async (runId: string) => {
       data,
       planId: data.id,
     };
+  } catch (error) {
+    return actionError(error);
+  }
+};
+
+export const generatePlannerRunAction = async (requestId: string) => {
+  try {
+    return { error: false as const, data: await generatePlannerRun(requestId) };
+  } catch (error) {
+    return actionError(error);
+  }
+};
+
+export const readPlannerGenerationAction = async (runId: string) => {
+  try {
+    return { error: false as const, data: await readPlannerGeneration(runId) };
+  } catch (error) {
+    return actionError(error);
+  }
+};
+
+export const readPlanningScreenAction = async () => {
+  try {
+    return { error: false as const, data: await readPlanningScreenDb() };
   } catch (error) {
     return actionError(error);
   }
