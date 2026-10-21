@@ -21,6 +21,11 @@ export const serverEnv = createEnv({
     STRIPE_WEBHOOK_SECRET: z.string().min(1),
     APP_URL: z.url().min(1),
     OPENROUTER_API_KEY: z.string().min(1),
+    OPENROUTER_MODEL: z
+      .string()
+      .trim()
+      .min(1)
+      .default("deepseek/deepseek-v4.1-flash-1017"),
     TRIGGER_SECRET_KEY: z.string().min(1),
     TRIGGER_PROJECT_REF: z.string().min(1),
   },

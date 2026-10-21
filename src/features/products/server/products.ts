@@ -5,20 +5,12 @@ import {
   ProductTable,
 } from "@/db/schema";
 import { userHasPermission } from "@/lib/auth/helpers";
-import { and, eq, SQL } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { revalidateProductCache } from "./cache/products";
 import { isValidId } from "@/lib/utils";
+import { confirmProductExistenceDb } from "./product-reads";
 
-export const confirmProductExistenceDb = async (
-  productId: string,
-  additionalFilters?: SQL<unknown>[],
-) => {
-  return (
-    (await db.query.ProductTable.findFirst({
-      where: and(eq(ProductTable.id, productId), ...(additionalFilters ?? [])),
-    })) ?? null
-  );
-};
+export { confirmProductExistenceDb } from "./product-reads";
 
 // Always recheck permissions to make sure that non-admin users can never access/modify data they aren't allowed to
 export const insertProductDb = async (productData: ProductInsertData) => {
