@@ -2,7 +2,6 @@ import { productCategories } from "@/db/shared";
 import {
   createLoader,
   parseAsArrayOf,
-  parseAsBoolean,
   parseAsString,
   parseAsStringEnum,
 } from "nuqs/server";

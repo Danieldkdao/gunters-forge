@@ -6,7 +6,6 @@ import {
   ArrowLeftIcon,
   BadgeCheckIcon,
   ClockIcon,
-  HammerIcon,
   SparklesIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";

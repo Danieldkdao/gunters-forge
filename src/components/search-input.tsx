@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDebouncedCallback } from "@tanstack/react-pacer";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "./ui/input-group";
 import { SearchIcon } from "lucide-react";
@@ -18,6 +18,7 @@ export const SearchInput = ({
   className?: string;
 }) => {
   const [search, setSearch] = useState(initialValue);
+  const [previousInitialValue, setPreviousInitialValue] = useState(initialValue);
   // Text appears in the input instantly, but the value is debounced
   const handleSearch = useDebouncedCallback(
     (value: string) => {
@@ -27,9 +28,10 @@ export const SearchInput = ({
   );
 
   // If initialValue changes we need to update the state to match
-  useEffect(() => {
+  if (previousInitialValue !== initialValue) {
+    setPreviousInitialValue(initialValue);
     setSearch(initialValue);
-  }, [initialValue]);
+  }
 
   return (
     <InputGroup className={cn(className)}>

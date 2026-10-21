@@ -43,6 +43,12 @@ export const Footer = () => {
               Shop products
             </Link>
             <Link
+              href="/play"
+              className="inline-flex min-h-11 items-center gap-2 font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Play Gunter&apos;s Mining Adventure
+            </Link>
+            <Link
               href="/orders"
               className="inline-flex min-h-11 items-center gap-2 font-medium text-muted-foreground transition-colors hover:text-foreground"
             >

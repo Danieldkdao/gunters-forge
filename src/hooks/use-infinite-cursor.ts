@@ -9,16 +9,12 @@ export const useInfiniteCursor = <T>(
   options: {
     rootMargin?: string;
     customErrorMessage?: string;
-    additionalDeps?: unknown[];
-    resetKey?: string;
     enabled?: boolean;
   } = {},
 ) => {
   const {
     rootMargin,
     customErrorMessage,
-    additionalDeps,
-    resetKey,
     enabled = true,
   } = options;
 
@@ -30,14 +26,6 @@ export const useInfiniteCursor = <T>(
   const [nextCursor, setNextCursor] = useState(initialNextCursor);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-
-  // Values are reset when resetKey changes
-  useEffect(() => {
-    loadingRef.current = false;
-    setItems(initialItems);
-    setNextCursor(initialNextCursor);
-    setError(null);
-  }, [resetKey]);
 
   useEffect(() => {
     // Prevent pending, disabled, error, or missing information states from reaching the fetchAction call
@@ -90,7 +78,7 @@ export const useInfiniteCursor = <T>(
     rootMargin,
     sentinelEl,
     enabled,
-    ...(additionalDeps?.length ? additionalDeps : []),
+    error,
   ]);
 
   return {

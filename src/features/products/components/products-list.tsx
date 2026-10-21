@@ -47,7 +47,6 @@ export const ProductsList = ({
     error,
     sentinelRef,
   } = useInfiniteCursor(initialProducts, initialNextCursor, fetchProducts, {
-    additionalDeps: [filters],
     customErrorMessage: "Failed to load products. Please try again.",
   });
 

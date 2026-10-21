@@ -1,5 +1,11 @@
-import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import { DashboardOverview } from "@/features/dashboard/components/dashboard-overview";
+import { DashboardSkeleton } from "@/features/dashboard/components/dashboard-skeleton";
 
 export default function DashboardPage() {
-  redirect("/dashboard/orders?view=queue");
+  return (
+    <Suspense fallback={<DashboardSkeleton />}>
+      <DashboardOverview />
+    </Suspense>
+  );
 }
