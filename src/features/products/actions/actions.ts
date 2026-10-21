@@ -195,6 +195,19 @@ export const readProductsAction = async (
 };
 export type ReadProductsAction = UnwrapAsync<typeof readProductsAction>;
 
+export const readFeaturedProductsAction = async () => {
+  "use cache";
+  cacheTag(getGlobalProductTag());
+  return db
+    .select()
+    .from(ProductTable)
+    .where(
+      and(eq(ProductTable.isActive, true), eq(ProductTable.featured, true)),
+    )
+    .orderBy(ProductTable.createdAt, ProductTable.id)
+    .limit(4);
+};
+
 export const readProductAction = async (productSlug: string) => {
   "use cache";
   cacheTag(getProductSlugTag(productSlug));

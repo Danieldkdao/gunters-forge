@@ -91,6 +91,12 @@ export const Header = () => {
               >
                 Shop
               </Link>
+              <Link
+                href="/play"
+                className="font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Play
+              </Link>
               {session?.user.role === "admin" && (
                 <Link
                   href="/dashboard"
