@@ -1,9 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  ArrowUpRightIcon,
   ClockIcon,
-  PlusIcon,
   SparklesIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +18,6 @@ import {
   formatPrice,
   formatProductCategory,
 } from "@/features/products/lib/formatters";
-import { Button } from "@/components/ui/button";
 import { AddToCartButton } from "@/features/cart/components/add-to-cart-button";
 
 export const ProductCard = ({ product }: { product: ProductSelectData }) => {

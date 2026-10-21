@@ -221,6 +221,17 @@ export const Header = () => {
             )}
           </div>
         </div>
+        <nav
+          aria-label="Mobile navigation"
+          className="flex flex-wrap items-center justify-center gap-x-6 border-t px-4 sm:hidden"
+        >
+          <Link href="/products" className="inline-flex min-h-11 items-center font-medium">Shop</Link>
+          <Link href="/orders" className="inline-flex min-h-11 items-center font-medium">My orders</Link>
+          <Link href="/play" className="inline-flex min-h-11 items-center font-medium">Play</Link>
+          {session?.user.role === "admin" && (
+            <Link href="/dashboard" className="inline-flex min-h-11 items-center font-medium">Dashboard</Link>
+          )}
+        </nav>
       </header>
     </>
   );
