@@ -6,16 +6,19 @@ import { defaultStatements, adminAc } from "better-auth/plugins/admin/access";
 const statement = {
   ...defaultStatements,
   product: ["create", "update"],
+  order: ["create", "read", "update", "cancel", "collect_cash"],
 } as const;
 
 const ac = createAccessControl(statement);
 
 const user = ac.newRole({
   product: [],
+  order: ["create", "read", "cancel"],
 });
 
 const admin = ac.newRole({
   product: ["create", "update"],
+  order: ["create", "read", "update", "cancel", "collect_cash"],
   ...adminAc.statements,
 });
 

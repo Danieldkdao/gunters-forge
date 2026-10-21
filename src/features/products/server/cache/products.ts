@@ -5,12 +5,14 @@ export const getGlobalProductTag = () => {
   return getGlobalTag("products");
 };
 
-export const getProductIdTag = (id: string) => {
-  return getIdTag("products", id);
+export const getProductSlugTag = (slug: string) => {
+  return getIdTag("products", slug);
 };
 
 // Expire product tags to ensure mutations always force fresh data
-export const revalidateProductCache = (id: string) => {
+export const revalidateProductCache = (...slugs: string[]) => {
   revalidateTag(getGlobalProductTag(), { expire: 0 });
-  revalidateTag(getProductIdTag(id), { expire: 0 });
+  for (const slug of new Set(slugs)) {
+    revalidateTag(getProductSlugTag(slug), { expire: 0 });
+  }
 };

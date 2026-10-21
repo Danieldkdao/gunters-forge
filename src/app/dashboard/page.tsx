@@ -1,5 +1,5 @@
-const DashboardPage = () => {
-  return <div>dashboard page</div>;
-};
+import { redirect } from "next/navigation";
 
-export default DashboardPage;
+export default function DashboardPage() {
+  redirect("/dashboard/orders?view=queue");
+}

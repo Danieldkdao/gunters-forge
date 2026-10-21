@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ShieldUserIcon, UserIcon } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { Controller, useForm, useFormState } from "react-hook-form";
 import { FaGithub, FaGoogle } from "react-icons/fa6";
@@ -66,7 +66,13 @@ export const AuthForm = ({ signIn = true }: { signIn?: boolean }) => {
     [searchParams],
   );
 
-  const callbackURL = searchParams.get("callbackUrl") || "/";
+  const callbackParam = searchParams.get("callbackUrl");
+  const callbackURL =
+    callbackParam?.startsWith("/") &&
+    !callbackParam.startsWith("//") &&
+    !callbackParam.includes("\\")
+      ? callbackParam
+      : "/";
 
   const handleSignUp = async (data: FormType) => {
     const { name, ...rest } = data;
@@ -112,7 +118,10 @@ export const AuthForm = ({ signIn = true }: { signIn?: boolean }) => {
 
   const handleTestSignIn = (role: UserRole) => {
     startTransition(async () => {
-      const response = await signInWithTestCredentials(role);
+      const response = await signInWithTestCredentials(
+        role,
+        searchParams.get("callbackUrl") ?? undefined,
+      );
       if (response.error) {
         toast.error(response.message);
       } else {
@@ -138,7 +147,13 @@ export const AuthForm = ({ signIn = true }: { signIn?: boolean }) => {
   const isAuthenticating = isSubmitting || isTestAuthenticating || isSocialAuth;
 
   if (verifyEmail) {
-    return <VerifyAccount email={verifyEmail} setEmail={setVerifyEmail} />;
+    return (
+      <VerifyAccount
+        email={verifyEmail}
+        setEmail={setVerifyEmail}
+        callbackURL={callbackURL}
+      />
+    );
   }
 
   return (

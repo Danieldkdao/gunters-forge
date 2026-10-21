@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db/db";
-import { ProductTable } from "@/db/schema";
+import { ProductCategory, ProductTable } from "@/db/schema";
 import { userHasPermission } from "@/lib/auth/helpers";
 import {
   GENERAL_ERROR_MESSAGE,
@@ -28,10 +28,13 @@ import {
   updateStripeProduct,
 } from "@/services/stripe/helpers";
 import { getPriceId } from "@/services/stripe/utils";
-import { and } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { cacheTag } from "next/cache";
 import { convertDollarsToCents } from "../lib/utils";
-import { getGlobalProductTag } from "../server/cache/products";
+import {
+  getGlobalProductTag,
+  getProductSlugTag,
+} from "../server/cache/products";
 import {
   confirmProductExistenceDb,
   insertProductDb,
@@ -191,6 +194,33 @@ export const readProductsAction = async (
   };
 };
 export type ReadProductsAction = UnwrapAsync<typeof readProductsAction>;
+
+export const readProductAction = async (productSlug: string) => {
+  "use cache";
+  cacheTag(getProductSlugTag(productSlug));
+
+  return (
+    (await db.query.ProductTable.findFirst({
+      where: and(
+        eq(ProductTable.isActive, true),
+        eq(ProductTable.slug, productSlug),
+      ),
+    })) ?? null
+  );
+};
+
+export const readRelatedProductsAction = async (category: ProductCategory) => {
+  "use cache";
+  cacheTag(getGlobalProductTag());
+
+  return db.query.ProductTable.findMany({
+    where: and(
+      eq(ProductTable.isActive, true),
+      eq(ProductTable.category, category),
+    ),
+    limit: 4,
+  });
+};
 
 export const createProductAction = async (unsafeData: CreateProductSchema) => {
   const { hasPermission } = await userHasPermission({ product: ["create"] });

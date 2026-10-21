@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "./lib/auth/helpers";
 
 const authRoutes = new Set(["/sign-in", "/sign-up"]);
-const protectedRoutes = ["/orders"];
+const protectedRoutes = ["/orders", "/checkout", "/payment"];
 const adminRoutes = ["/dashboard"];
 
 const matchesRoutePrefix = (pathname: string, route: string) => {
@@ -36,6 +36,10 @@ export const proxy = async (request: NextRequest) => {
     }
 
     const signInUrl = new URL("/sign-in", request.url);
+    signInUrl.searchParams.set(
+      "callbackUrl",
+      `${pathname}${request.nextUrl.search}`,
+    );
     return NextResponse.redirect(signInUrl);
   }
 
@@ -53,5 +57,12 @@ export const proxy = async (request: NextRequest) => {
 };
 
 export const config = {
-  matcher: ["/sign-in", "/sign-up", "/dashboard/:path*", "/orders/:path*"],
+  matcher: [
+    "/sign-in",
+    "/sign-up",
+    "/dashboard/:path*",
+    "/orders/:path*",
+    "/checkout",
+    "/payment/:path*",
+  ],
 };

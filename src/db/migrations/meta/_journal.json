@@ -36,6 +36,20 @@
       "when": 1792463090115,
       "tag": "0004_icy_sister_grimm",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792538204707,
+      "tag": "0005_redundant_shinobi_shaw",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792544412980,
+      "tag": "0006_order_checkout",
+      "breakpoints": true
     }
   ]
 }
