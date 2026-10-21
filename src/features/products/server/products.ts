@@ -31,7 +31,7 @@ export const insertProductDb = async (productData: ProductInsertData) => {
     .returning();
   if (!insertedProduct) return null;
 
-  revalidateProductCache(insertedProduct.id);
+  revalidateProductCache(insertedProduct.slug);
 
   return insertedProduct;
 };
@@ -55,7 +55,7 @@ export const updateProductDb = async (
     .returning();
   if (!updatedProduct) return null;
 
-  revalidateProductCache(updatedProduct.id);
+  revalidateProductCache(existingProduct.slug, updatedProduct.slug);
 
   return updatedProduct;
 };

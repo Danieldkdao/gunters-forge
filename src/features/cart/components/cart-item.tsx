@@ -3,7 +3,9 @@ import { ReadCartProductsAction } from "../actions/actions";
 import { useCartStore } from "@/stores/cart-store";
 import { formatPrice } from "@/features/products/lib/formatters";
 import { Button } from "@/components/ui/button";
-import { Trash2Icon, MinusIcon, PlusIcon } from "lucide-react";
+import { Trash2Icon } from "lucide-react";
+
+import { ProductQuantity } from "@/features/products/components/product-quantity";
 
 export const CartItem = ({
   product,
@@ -60,29 +62,14 @@ export const CartItem = ({
           </Button>
         </div>
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="flex items-center rounded-md border">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Decrease ${product.name} quantity`}
-              onClick={() => removeItem(product.id)}
-            >
-              <MinusIcon aria-hidden="true" />
-            </Button>
-            <span className="min-w-8 px-1 text-center font-medium tabular-nums">
-              {quantity}
-            </span>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Increase ${product.name} quantity`}
-              onClick={() => addItem(product.id)}
-            >
-              <PlusIcon aria-hidden="true" />
-            </Button>
-          </div>
+          {/* Allow decrementing to 0 so the store can remove the item */}
+          <ProductQuantity
+            quantity={quantity}
+            label={product.name}
+            min={0}
+            onDecrement={() => removeItem(product.id)}
+            onIncrement={() => addItem(product.id)}
+          />
           <div className="text-right">
             <p className="font-semibold text-lg tabular-nums">
               {formatPrice(product.price * quantity)}

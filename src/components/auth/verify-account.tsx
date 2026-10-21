@@ -4,16 +4,16 @@ import { authClient } from "@/lib/auth/auth-client";
 import { GENERAL_ERROR_MESSAGE } from "@/lib/constants";
 import { SetterType } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "../ui/toast";
 import z from "zod";
-import { Card, CardContent } from "../ui/card";
-import { Field, FieldContent, FieldError } from "../ui/field";
+import { LoadingSwap } from "../loading-swap";
 import { OTPInput } from "../otp-input";
 import { Button } from "../ui/button";
-import { LoadingSwap } from "../loading-swap";
-import { useRouter } from "next/navigation";
+import { Card, CardContent } from "../ui/card";
+import { Field, FieldContent, FieldError } from "../ui/field";
+import { toast } from "../ui/toast";
 
 const formSchema = z.object({
   otp: z.string().length(6, { error: "OTP must be 6 characters long." }),
@@ -24,9 +24,14 @@ type FormType = z.infer<typeof formSchema>;
 type VerifyAccountProps = {
   email: string;
   setEmail: SetterType<string | null>;
+  callbackURL?: string;
 };
 
-export const VerifyAccount = ({ email, setEmail }: VerifyAccountProps) => {
+export const VerifyAccount = ({
+  email,
+  setEmail,
+  callbackURL = "/",
+}: VerifyAccountProps) => {
   const router = useRouter();
   const [timeToResend, setTimeToResend] = useState(30);
   const [isResending, setIsResending] = useState(false);
@@ -54,7 +59,7 @@ export const VerifyAccount = ({ email, setEmail }: VerifyAccountProps) => {
       fetchOptions: {
         onSuccess: () => {
           toast.success("Account verified successfully!");
-          router.push("/dashboard");
+          router.push(callbackURL);
           setEmail(null);
         },
         onError: (error) => {

@@ -5,3 +5,5 @@ export const cancellableStatuses: OrderStatus[] = [
   "pending_payment",
   "queued",
 ];
+
+export const checkoutStorageKey = "gunters-forge-checkout";

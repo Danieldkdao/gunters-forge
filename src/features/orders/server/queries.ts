@@ -141,3 +141,6 @@ export const readOrdersDb = async (
   });
   return { data, nextCursor, key };
 };
+
+export type OrderListData = Awaited<ReturnType<typeof readOrdersDb>>["data"][number];
+export type OrderDetailsData = Awaited<ReturnType<typeof readOrderDb>>;

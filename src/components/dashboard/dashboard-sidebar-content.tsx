@@ -15,6 +15,8 @@ import {
   ShoppingBagIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
+import { Skeleton } from "../ui/skeleton";
 
 const navigation = [
   {
@@ -34,7 +36,19 @@ const navigation = [
   },
 ];
 
-export const DashboardSidebarContent = () => {
+export const DashboardSidebarContent = () => (
+  <Suspense
+    fallback={
+      <SidebarContent>
+        <Skeleton className="h-32" />
+      </SidebarContent>
+    }
+  >
+    <SidebarNavigation />
+  </Suspense>
+);
+
+const SidebarNavigation = () => {
   const pathname = usePathname();
 
   return (
@@ -47,7 +61,11 @@ export const DashboardSidebarContent = () => {
                 <SidebarMenuButton
                   tooltip={item.title}
                   render={<Link href={item.url} />}
-                  isActive={pathname === item.url}
+                  isActive={
+                    pathname === item.url ||
+                    (item.url !== "/dashboard" &&
+                      pathname.startsWith(`${item.url}/`))
+                  }
                   className="flex items-center gap-2 h-10"
                 >
                   <item.icon className="not-group-data-[collapsible=icon]:size-5!" />

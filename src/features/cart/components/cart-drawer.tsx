@@ -25,6 +25,7 @@ import {
   Trash2Icon,
 } from "lucide-react";
 import { useState, type ReactElement } from "react";
+import { useRouter } from "next/navigation";
 import { readCartProductsAction } from "../actions/actions";
 import { CartItem } from "./cart-item";
 
@@ -55,6 +56,8 @@ export const CartDrawer = ({
   open?: boolean;
   onOpenChange?: SetterType<boolean>;
 }) => {
+  const router = useRouter();
+  const clearItem = useCartStore((state) => state.clearItem);
   const items = useCartStore((state) => state.items);
   const hasHydrated = useCartStore((state) => state.hasHydrated);
   const [isOpen, setIsOpen] = useState(false);
@@ -236,11 +239,11 @@ export const CartDrawer = ({
                         />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="font-semibold">Product unavailable</p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-lg font-semibold">Product unavailable</p>
+                        <p className="text-base text-muted-foreground">
                           Quantity: {item.quantity}
                         </p>
-                        <p className="mt-1 text-sm text-destructive">
+                        <p className="mt-1 text-base text-destructive">
                           Remove this item to continue.
                         </p>
                       </div>
@@ -249,6 +252,7 @@ export const CartDrawer = ({
                         variant="ghost"
                         size="icon-sm"
                         aria-label="Remove unavailable item"
+                        onClick={() => clearItem(item.productId)}
                       >
                         <Trash2Icon aria-hidden="true" />
                       </Button>
@@ -285,7 +289,15 @@ export const CartDrawer = ({
               Some items are no longer available. Remove them before checkout.
             </p>
           )}
-          <Button type="button" className="h-11 w-full" disabled={!canCheckout}>
+          <Button
+            type="button"
+            className="h-11 w-full"
+            disabled={!canCheckout}
+            onClick={() => {
+              onOpenChangeToUse(false);
+              router.push("/checkout");
+            }}
+          >
             Checkout
             <ArrowRightIcon aria-hidden="true" />
           </Button>

@@ -8,7 +8,10 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 // Allow for easy access and testing with test accounts, credentials stay on the server
-export const signInWithTestCredentials = async (role: UserRole) => {
+export const signInWithTestCredentials = async (
+  role: UserRole,
+  requestedCallback?: string,
+) => {
   const credentialMap: Record<UserRole, { email: string; password: string }> = {
     admin: {
       email: serverEnv.TEST_ADMIN_EMAIL,
@@ -28,10 +31,19 @@ export const signInWithTestCredentials = async (role: UserRole) => {
     };
   }
 
+  // Make sure to recheck callbackURL sent from the client
+  const callbackURL =
+    requestedCallback?.startsWith("/") &&
+    !requestedCallback.startsWith("//") &&
+    !requestedCallback.includes("\\")
+      ? requestedCallback
+      : role === "admin"
+        ? "/dashboard"
+        : "/";
   const data = await auth.api.signInEmail({
     body: {
       ...credentials,
-      callbackURL: role === "admin" ? "/dashboard" : "/",
+      callbackURL,
     },
     headers: await headers(),
   });
