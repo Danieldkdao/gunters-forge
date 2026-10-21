@@ -14,6 +14,9 @@ export const OrderTable = pgTable("orders", {
     .generatedAlwaysAsIdentity()
     .notNull()
     .unique(),
+  requestId: uuid("request_id").defaultRandom().notNull().unique(),
+  stripeCheckoutSessionId: text("stripe_checkout_session_id").unique(),
+  stripePaymentIntentId: text("stripe_payment_intent_id").unique(),
   userId: uuid("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),

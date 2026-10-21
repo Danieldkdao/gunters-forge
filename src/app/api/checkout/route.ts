@@ -1,86 +1,82 @@
-import { serverEnv } from "@/data/env/server";
-import { ProductSelectData } from "@/db/schema";
-import { confirmProductExistenceDb } from "@/features/products/server/products";
 import { errorResponse } from "@/lib/api-helpers";
-import { getCurrentUser } from "@/lib/auth/helpers";
+import { createOrderSchema } from "@/features/orders/actions/schemas";
 import {
-  INVALID_DATA_ERROR_MESSAGE,
-  NOT_FOUND_ERROR_MESSAGE,
-  UNAUTHED_ERROR_MESSAGE,
-} from "@/lib/constants";
-import { errorMessage } from "@/lib/utils";
-import { stripe } from "@/services/stripe";
-import {
-  CartItemSchema,
-  cartItemSchema,
-} from "@/features/cart/actions/schemas";
+  createOrderDb,
+  requireOrderUser,
+} from "@/features/orders/server/orders";
+import { createOrderCheckoutSession } from "@/features/orders/server/payments";
 import { NextResponse } from "next/server";
 import z from "zod";
+import { isValidId } from "@/lib/utils";
 
 export const POST = async (req: Request) => {
-  const { userId, user } = await getCurrentUser(req.headers);
-  if (!userId || !user || user.banned || !user.emailVerified) {
-    return errorResponse(UNAUTHED_ERROR_MESSAGE, 401);
-  }
-
-  const { cartItems }: { cartItems: CartItemSchema[] } = await req.json();
-  if (
-    !cartItems.length ||
-    !z.array(cartItemSchema).safeParse(cartItems).success
-  ) {
-    return errorResponse(INVALID_DATA_ERROR_MESSAGE, 400);
-  }
-
-  const existingCartItems = (
-    await Promise.all(
-      cartItems.map((cartItem) =>
-        (async () => {
-          const existingProduct = await confirmProductExistenceDb(
-            cartItem.productId,
-          );
-
-          return {
-            product: existingProduct,
-            quantity: cartItem.quantity,
-          };
-        })(),
-      ),
-    )
-  ).filter(
-    (cartItem): cartItem is { product: ProductSelectData; quantity: number } =>
-      Boolean(cartItem.product),
-  );
-  if (existingCartItems.length !== cartItems.length) {
-    return errorResponse(NOT_FOUND_ERROR_MESSAGE, 404);
-  }
-
-  // TODO: create pending order and order iteme
-
   try {
-    const checkoutSession = await stripe.checkout.sessions.create({
-      mode: "payment",
-      allowed_payment_method_types: ["card"],
-      line_items: existingCartItems.map((cartItem) => ({
-        price: cartItem.product.stripePriceId,
-        quantity: cartItem.quantity,
-      })),
-      // TODO: add order ID so we can resolve this later
-      metadata: {
-        userId,
-      },
-      customer_email: user.email,
-      // TODO: create these routes
-      success_url: `${serverEnv.APP_URL}/payment/success`,
-      cancel_url: `${serverEnv.APP_URL}/payment/cancel`,
+    await requireOrderUser();
+  } catch {
+    return errorResponse(
+      "You must sign in with a verified account to check out.",
+      401,
+    );
+  }
+  let input: unknown;
+  try {
+    input = await req.json();
+  } catch {
+    return errorResponse("Invalid checkout data.", 400);
+  }
+  const body = z
+    .object({
+      cartItems: createOrderSchema.shape.cartItems,
+      deliveryAddress: createOrderSchema.shape.deliveryAddress,
+      customerNotes: createOrderSchema.shape.customerNotes,
+      requestId: z.uuid().optional(),
+    })
+    .strict()
+    .safeParse(input);
+  const headerRequestId = req.headers.get("idempotency-key");
+  if (
+    !body.success ||
+    (headerRequestId !== null && !isValidId(headerRequestId))
+  ) {
+    return errorResponse("Invalid checkout data.", 400);
+  }
+  if (
+    headerRequestId &&
+    body.data.requestId &&
+    headerRequestId !== body.data.requestId
+  ) {
+    return errorResponse("Conflicting request IDs.", 400);
+  }
+  let orderId: string | undefined;
+  try {
+    const order = await createOrderDb({
+      ...body.data,
+      paymentMethod: "stripe",
+      requestId: headerRequestId ?? body.data.requestId,
     });
-
+    // Preserve order ID on errors if possible so that client can retry the payment
+    orderId = order.id;
+    const session = await createOrderCheckoutSession(order.id);
     return NextResponse.json({
       error: false,
       message: "Checkout session created successfully!",
-      url: checkoutSession.url,
+      orderId: order.id,
+      url: session.url,
     });
   } catch (error) {
-    console.error(error);
-    return errorResponse(errorMessage(error), 500);
+    console.error(
+      "Order checkout failed",
+      error instanceof Error ? error.message : "Unknown error",
+    );
+    return NextResponse.json(
+      {
+        error: true,
+        message: orderId
+          ? "Unable to start checkout. Retry payment for this order."
+          : "Unable to create this order. Check that all products are available.",
+        ...(orderId ? { orderId } : {}),
+      },
+      { status: orderId ? 502 : 400 },
+    );
   }
 };

@@ -7,6 +7,7 @@ import {
 import { userHasPermission } from "@/lib/auth/helpers";
 import { and, eq, SQL } from "drizzle-orm";
 import { revalidateProductCache } from "./cache/products";
+import { isValidId } from "@/lib/utils";
 
 export const confirmProductExistenceDb = async (
   productId: string,
@@ -57,4 +58,17 @@ export const updateProductDb = async (
   revalidateProductCache(updatedProduct.id);
 
   return updatedProduct;
+};
+
+export const populateProductIds = async (productIds: string[]) => {
+  if (!isValidId(productIds)) return null;
+
+  const existingCartItems = (
+    await Promise.all(
+      productIds.map((productId) => confirmProductExistenceDb(productId)),
+    )
+  ).filter((product): product is ProductSelectData => Boolean(product));
+  if (existingCartItems.length !== productIds.length) return null;
+
+  return existingCartItems;
 };
