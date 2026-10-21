@@ -1,4 +1,11 @@
-import { integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { id, timestamps } from "../helpers";
 import { user } from "./user";
 import {
@@ -31,6 +38,8 @@ export const OrderTable = pgTable("orders", {
   deliveryAddress: text("delivery_address"),
   customerNotes: text("customer_notes"),
   queueRank: integer("queue_rank"),
+  // Add a boolean manual ranking field for ranking instead of relying on order numbers
+  queueRankIsManual: boolean("queue_rank_is_manual").notNull().default(false),
   queuedAt: timestamp("queued_at", { withTimezone: true }),
   startedAt: timestamp("started_at", { withTimezone: true }),
   completedAt: timestamp("completed_at", { withTimezone: true }),

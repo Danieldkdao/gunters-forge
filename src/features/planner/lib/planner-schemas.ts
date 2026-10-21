@@ -1,4 +1,5 @@
 import z from "zod";
+import { plannerWorkTypes } from "@/db/shared";
 
 export const plannerInputSchema = z.object({}).strict();
 
@@ -10,12 +11,7 @@ export const plannerOutputSchema = z
         z
           .object({
             orderRef: z.string().regex(/^order-[1-9]\d*$/),
-            workType: z.enum([
-              "small_job",
-              "extended_project",
-              "batch_candidate",
-              "standard",
-            ]),
+            workType: z.enum(plannerWorkTypes),
             reason: z.string().trim().min(1).max(300),
           })
           .strict(),

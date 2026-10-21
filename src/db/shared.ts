@@ -45,3 +45,27 @@ export const orderPaymentStatusEnum = pgEnum(
   "order_payment_statuses",
   orderPaymentStatuses,
 );
+
+export const plannerRunStatuses = [
+  "pending_review",
+  "approved",
+  "applied",
+  "rejected",
+  "stale",
+] as const;
+export const plannerRunStatusEnum = pgEnum(
+  "planner_run_statuses",
+  plannerRunStatuses,
+);
+export type PlannerRunStatus = (typeof plannerRunStatuses)[number];
+
+export const plannerWorkTypes = [
+  "small_job",
+  "extended_project",
+  "batch_candidate",
+  "standard",
+] as const;
+export const plannerWorkTypeEnum = pgEnum(
+  "planner_work_types",
+  plannerWorkTypes,
+);

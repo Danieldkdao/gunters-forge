@@ -17,7 +17,7 @@ export const planForgeQueue = async () => {
       orderRef,
       status: order.status,
       currentPosition: index + 1,
-      hasManualPriority: order.queueRank !== null,
+      hasManualPriority: order.queueRank !== null && order.queueRankIsManual,
       waitingMinutes: Math.max(
         0,
         Math.floor(
